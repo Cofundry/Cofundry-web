@@ -12,6 +12,7 @@ import { ApplicationModal } from "@/components/ui/ApplicationModal"
 import { Project } from "@/lib/models/Project"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { useLoading } from "@/components/ui/LoadingProvider"
 
 interface ProjectsResponse {
   projects: Project[]
@@ -26,9 +27,10 @@ interface ProjectsResponse {
 
 export default function HomePage() {
   const router = useRouter()
+  const { setLoading } = useLoading()
   
   const [projects, setProjects] = useState<Project[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLocalLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [totalProjects, setTotalProjects] = useState(0)
@@ -45,6 +47,7 @@ export default function HomePage() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
 
   const fetchProjects = async () => {
+    setLocalLoading(true)
     setLoading(true)
     try {
       const params = new URLSearchParams({
@@ -67,6 +70,7 @@ export default function HomePage() {
       console.error("Error fetching projects:", error)
       toast.error("Failed to load projects")
     } finally {
+      setLocalLoading(false)
       setLoading(false)
     }
   }
@@ -116,7 +120,7 @@ export default function HomePage() {
               "name": "⭐ Cofundry",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://cofundry.com/favicon.svg"
+                "url": "https://cofundry.com/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png"
               }
             }
           })

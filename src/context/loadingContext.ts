@@ -1,7 +1,4 @@
-// src/context/LoadingContext.tsx
-import { createContext } from "react";
+// This file is deprecated - use @/components/ui/LoadingProvider instead
+// Keeping for backward compatibility
 
-export const LoadingContext = createContext<{ loading: boolean; setLoading: (v: boolean) => void }>({
-  loading: false,
-  setLoading: () => {},
-});
+export { LoadingProvider, useLoading } from "@/components/ui/LoadingProvider";
