@@ -104,3 +104,46 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to update project' }, { status: 500 });
   }
 }
+
+// ===== DELETE Project by ID =====
+export async function DELETE(request: NextRequest) {
+  try {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
+    const projectId = getProjectIdFromUrl(request);
+    if (!ObjectId.isValid(projectId)) {
+      return NextResponse.json({ error: 'Invalid project ID' }, { status: 400 });
+    }
+
+    const db = await getDB();
+    const projectsCollection = db.collection('projects');
+
+    // Ensure user owns the project
+    const existingProject = await projectsCollection.findOne({
+      _id: new ObjectId(projectId),
+      authorId: user.id,
+    });
+
+    if (!existingProject) {
+      return NextResponse.json({ error: 'Project not found or access denied' }, { status: 404 });
+    }
+
+    // Delete the project
+    await projectsCollection.deleteOne({ _id: new ObjectId(projectId) });
+
+    // Also delete related applications and comments
+    const applicationsCollection = db.collection('applications');
+    const commentsCollection = db.collection('comments');
+    
+    await applicationsCollection.deleteMany({ projectId });
+    await commentsCollection.deleteMany({ projectId });
+
+    return NextResponse.json({ message: 'Project deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting project:', error);
+    return NextResponse.json({ error: 'Failed to delete project' }, { status: 500 });
+  }
+}

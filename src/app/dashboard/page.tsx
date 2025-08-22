@@ -241,6 +241,26 @@ export default function DashboardPage() {
     setIsApplicationModalOpen(true)
   }
 
+  const handleDeleteProject = async (projectId: string) => {
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: "DELETE",
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        toast.success("Project deleted successfully!");
+        fetchMyProjects(); // Refresh the list
+      } else {
+        const error = await response.json();
+        toast.error(error.message || "Failed to delete project");
+      }
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      toast.error("Failed to delete project");
+    }
+  };
+
   const formatDate = (date?: Date | string) => {
     if (!date) return 'N/A'
     const d = new Date(date)
@@ -381,7 +401,8 @@ export default function DashboardPage() {
                       <ProjectCard
                         key={project._id}
                         project={project}
-                        onApply={() => handleApply(project)}
+                        onApply={handleApply}
+                        currentUser={user ? { id: user.id, name: user.name, email: user.email, avatar: user.avatar } : undefined}
                       />
                     ))}
                   </div>
@@ -440,15 +461,11 @@ export default function DashboardPage() {
                         <ProjectCard
                           project={project}
                           onApply={() => {}} // No apply button for own projects
+                          currentUser={user ? { id: user.id, name: user.name, email: user.email, avatar: user.avatar } : undefined}
+                          showEditDelete={true}
+                          onEdit={handleEditProject}
+                          onDelete={handleDeleteProject}
                         />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => project._id && handleEditProject(project._id)}
-                          className="absolute top-2 right-2 z-10"
-                        >
-                          Edit
-                        </Button>
                       </div>
                     ))}
                   </div>

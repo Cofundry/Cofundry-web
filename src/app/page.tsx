@@ -144,7 +144,7 @@ export default function HomePage() {
                       <ProjectCard
                         key={project._id}
                         project={project}
-                        onApply={() => handleApply(project)}
+                        onApply={handleApply}
                       />
                     ))}
                   </div>
