@@ -25,13 +25,14 @@ async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
   }
 }
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await getAuthenticatedUser();
     if (!user) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
+    const { id } = await params;
     const body = await request.json();
     const { projectId, text } = body;
     
@@ -39,7 +40,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       return NextResponse.json({ error: "Project ID and text are required" }, { status: 400 });
     }
 
-    if (!ObjectId.isValid(params.id) || !ObjectId.isValid(projectId)) {
+    if (!ObjectId.isValid(id) || !ObjectId.isValid(projectId)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
 
@@ -48,7 +49,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     
     // Find the comment and ensure user owns it
     const comment = await commentsCollection.findOne({
-      _id: new ObjectId(params.id),
+      _id: new ObjectId(id),
       projectId,
       userId: user.id
     });
@@ -59,7 +60,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
     // Update the comment
     await commentsCollection.updateOne(
-      { _id: new ObjectId(params.id) },
+      { _id: new ObjectId(id) },
       { 
         $set: { 
           text, 
@@ -75,13 +76,14 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await getAuthenticatedUser();
     if (!user) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
+    const { id } = await params;
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get("projectId");
     
@@ -89,7 +91,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return NextResponse.json({ error: "Project ID is required" }, { status: 400 });
     }
 
-    if (!ObjectId.isValid(params.id) || !ObjectId.isValid(projectId)) {
+    if (!ObjectId.isValid(id) || !ObjectId.isValid(projectId)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
 
@@ -98,7 +100,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     
     // Find the comment and ensure user owns it
     const comment = await commentsCollection.findOne({
-      _id: new ObjectId(params.id),
+      _id: new ObjectId(id),
       projectId,
       userId: user.id
     });
@@ -108,7 +110,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     // Delete the comment
-    await commentsCollection.deleteOne({ _id: new ObjectId(params.id) });
+    await commentsCollection.deleteOne({ _id: new ObjectId(id) });
 
     return NextResponse.json({ success: true });
   } catch (error) {
