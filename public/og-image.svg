@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2d2d2d;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  
+  <!-- Star Icon -->
+  <g transform="translate(100, 165)">
+    <path d="M60 15l11.59 34.72L110 45.68l-22.5 21.94 5.29 30.86L60 85.39l-32.79 15.43L42.5 67.62 20 45.68l32.41-3.46L60 15z" fill="url(#starGradient)" stroke="#FF8C00" stroke-width="2"/>
+    <circle cx="60" cy="60" r="52.5" fill="none" stroke="#FFD700" stroke-width="1.5" opacity="0.3"/>
+  </g>
+  
+  <!-- Main Text -->
+  <text x="600" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white">
+    Cofundry
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="280" text-anchor="middle" font-family="Arial, sans-serif" font-size="36" fill="#FFD700">
+    Collaborate • Build • Succeed
+  </text>
+  
+  <!-- Description -->
+  <text x="600" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#cccccc" max-width="1000">
+    The premier platform for students, SaaS developers, and professionals
+  </text>
+  
+  <!-- Bottom Text -->
+  <text x="600" y="580" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#999999">
+    Find teammates • Showcase projects • Build the future together
+  </text>
+  
+  <!-- Decorative Elements -->
+  <circle cx="200" cy="500" r="3" fill="#FFD700" opacity="0.6"/>
+  <circle cx="250" cy="480" r="2" fill="#FFA500" opacity="0.4"/>
+  <circle cx="300" cy="520" r="2.5" fill="#FF8C00" opacity="0.5"/>
+  <circle cx="1000" cy="480" r="3" fill="#FFD700" opacity="0.6"/>
+  <circle cx="950" cy="500" r="2" fill="#FFA500" opacity="0.4"/>
+  <circle cx="900" cy="460" r="2.5" fill="#FF8C00" opacity="0.5"/>
+</svg>

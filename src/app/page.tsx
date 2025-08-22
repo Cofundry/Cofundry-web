@@ -95,106 +95,147 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar1 />
-      <Hero />
-      
-      {/* Projects Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto">
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Filter Sidebar */}
-            <div className="lg:w-80 flex-shrink-0">
-              <FilterSidebar
-                search={search}
-                category={category}
-                difficulty={difficulty}
-                location={location}
-                onSearchChange={setSearch}
-                onCategoryChange={setCategory}
-                onDifficultyChange={setDifficulty}
-                onLocationChange={setLocation}
-                onClearFilters={clearFilters}
-              />
-            </div>
-
-            {/* Projects Grid */}
-            <div className="flex-1">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
-                <p className="text-sm md:text-base text-muted-foreground font-medium">
-                  {loading ? "Loading..." : `${totalProjects} projects found`}
-                </p>
-                {totalProjects > 0 && (
-                  <p className="text-sm md:text-base text-muted-foreground">
-                    Page {currentPage} of {totalPages}
-                  </p>
-                )}
-              </div>
-
-              {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                  {[...Array(6)].map((_, i) => (
-                    <div key={i} className="h-72 sm:h-80 bg-muted animate-pulse rounded-lg" />
-                  ))}
-                </div>
-              ) : projects.length > 0 ? (
-                <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
-                    {projects.map((project) => (
-                      <ProjectCard
-                        key={project._id}
-                        project={project}
-                        onApply={handleApply}
-                      />
-                    ))}
-                  </div>
-                  
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                  />
-                </>
-              ) : (
-                <div className="text-center py-12">
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
-                    No projects found
-                  </h3>
-                  <p className="text-muted-foreground mb-4">
-                    Try adjusting your search criteria or check back later
-                  </p>
-                  <button
-                    onClick={clearFilters}
-                    className="text-primary hover:underline"
-                  >
-                    Clear all filters
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <Footer7 
-        sections={[
-          {
-            title: "Platform",
-            links: [
-              { name: "Home", href: "/" },
-              { name: "Projects", href: "/projects" },
-              { name: "How It Works", href: "#" }
-            ]
-          },
-          {
-            title: "Account",
-            links: [
-              { name: "Login", href: "/login" },
-              { name: "Sign up", href: "/register" }
-            ]
-          }
-        ]}
+    <>
+      {/* Schema.org Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "⭐ Cofundry",
+            "description": "The premier platform for students, SaaS developers, and professionals to collaborate on innovative projects",
+            "url": "https://cofundry.com",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://cofundry.com/projects?search={search_term_string}",
+              "query-input": "required name=search_term_string"
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "⭐ Cofundry",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://cofundry.com/favicon.svg"
+              }
+            }
+          })
+        }}
       />
-    </div>
+
+      <div className="min-h-screen bg-background">
+        <header>
+          <Navbar1 />
+        </header>
+        
+        <main>
+          <Hero />
+          
+          {/* Projects Section */}
+          <section className="py-16 px-4" aria-labelledby="projects-heading">
+            <div className="container mx-auto">
+              <h2 id="projects-heading" className="sr-only">Available Projects</h2>
+              <div className="flex flex-col lg:flex-row gap-8">
+                {/* Filter Sidebar */}
+                <aside className="lg:w-80 flex-shrink-0" aria-label="Project filters">
+                  <FilterSidebar
+                    search={search}
+                    category={category}
+                    difficulty={difficulty}
+                    location={location}
+                    onSearchChange={setSearch}
+                    onCategoryChange={setCategory}
+                    onDifficultyChange={setDifficulty}
+                    onLocationChange={setLocation}
+                    onClearFilters={clearFilters}
+                  />
+                </aside>
+
+                {/* Projects Grid */}
+                <div className="flex-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
+                    <p className="text-sm md:text-base text-muted-foreground font-medium">
+                      {loading ? "Loading..." : `${totalProjects} projects found`}
+                    </p>
+                    {totalProjects > 0 && (
+                      <p className="text-sm md:text-base text-muted-foreground">
+                        Page {currentPage} of {totalPages}
+                      </p>
+                    )}
+                  </div>
+
+                  {loading ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" aria-label="Loading projects">
+                      {[...Array(6)].map((_, i) => (
+                        <div key={i} className="h-72 sm:h-80 bg-muted animate-pulse rounded-lg" aria-hidden="true" />
+                      ))}
+                    </div>
+                  ) : projects.length > 0 ? (
+                    <>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8" role="list" aria-label="Project listings">
+                        {projects.map((project) => (
+                          <article key={project._id} role="listitem">
+                            <ProjectCard
+                              project={project}
+                              onApply={handleApply}
+                            />
+                          </article>
+                        ))}
+                      </div>
+                      
+                      <nav aria-label="Project pagination">
+                        <Pagination
+                          currentPage={currentPage}
+                          totalPages={totalPages}
+                          onPageChange={handlePageChange}
+                        />
+                      </nav>
+                    </>
+                  ) : (
+                    <div className="text-center py-12" role="status" aria-live="polite">
+                      <h3 className="text-xl font-semibold text-foreground mb-2">
+                        No projects found
+                      </h3>
+                      <p className="text-muted-foreground mb-4">
+                        Try adjusting your search criteria or check back later
+                      </p>
+                      <button
+                        onClick={clearFilters}
+                        className="text-primary hover:underline"
+                        aria-label="Clear all search filters"
+                      >
+                        Clear all filters
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <footer>
+          <Footer7 
+            sections={[
+              {
+                title: "Platform",
+                links: [
+                  { name: "Home", href: "/" },
+                  { name: "Projects", href: "/projects" },
+                  { name: "How It Works", href: "#" }
+                ]
+              },
+              {
+                title: "Account",
+                links: [
+                  { name: "Login", href: "/login" },
+                  { name: "Sign up", href: "/register" }
+                ]
+              }
+            ]}
+          />
+        </footer>
+      </div>
+    </>
   )
 }

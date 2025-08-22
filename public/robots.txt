@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://cofundry.com/sitemap.xml
+
+# Disallow admin and private areas
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+
+# Allow important pages
+Allow: /
+Allow: /projects
+Allow: /login
+Allow: /register
+Allow: /about
+Allow: /contact
+
+# Crawl delay (optional)
+Crawl-delay: 1
