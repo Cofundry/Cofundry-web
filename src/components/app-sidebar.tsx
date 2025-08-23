@@ -18,6 +18,7 @@ import {
   Database,
   Paintbrush,
   Zap,
+  Building2,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -84,6 +85,11 @@ const data = {
         title: "Integrations",
         url: "/dashboard/Integrations",
         icon: Zap,
+      },
+      {
+        title: "SaaS",
+        url: "/dashboard/saas",
+        icon: Building2,
       },
   
    

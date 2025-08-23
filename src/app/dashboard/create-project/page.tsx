@@ -9,14 +9,32 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { X, Plus } from "lucide-react"
+import { X, Plus, Image as ImageIcon } from "lucide-react"
 import { toast } from "sonner"
 
 interface ProjectFormData {
   title: string
   description: string
+  logo: string
+  logoFile: File | null
   requirements: string
+  
+  // Team composition
   teamSize: number | ""
+  teamComposition: {
+    developers: number | ""
+    designers: number | ""
+    marketers: number | ""
+    commercials: number | ""
+    others: number | ""
+  }
+  
+  // Role-specific requirements
+  developerRequirements: string
+  designerRequirements: string
+  marketerRequirements: string
+  commercialRequirements: string
+  
   techStack: string[]
   tags: string[]
   deadline: string
@@ -51,8 +69,21 @@ export default function CreateProjectPage() {
   const [formData, setFormData] = useState<ProjectFormData>({
     title: "",
     description: "",
+    logo: "",
+    logoFile: null,
     requirements: "",
     teamSize: "",
+    teamComposition: {
+      developers: "",
+      designers: "",
+      marketers: "",
+      commercials: "",
+      others: ""
+    },
+    developerRequirements: "",
+    designerRequirements: "",
+    marketerRequirements: "",
+    commercialRequirements: "",
     techStack: [],
     tags: [],
     deadline: "",
@@ -71,6 +102,7 @@ export default function CreateProjectPage() {
       github: ""
     }
   })
+  const [logoPreview, setLogoPreview] = useState<string>("")
 
   const [newTech, setNewTech] = useState("")
   const [newTag, setNewTag] = useState("")
@@ -89,8 +121,21 @@ export default function CreateProjectPage() {
         setFormData({
           title: project.title || "",
           description: project.description || "",
+          logo: project.logo || "",
+          logoFile: null,
           requirements: project.requirements || "",
           teamSize: project.teamSize || "",
+          teamComposition: project.teamComposition || {
+            developers: "",
+            designers: "",
+            marketers: "",
+            commercials: "",
+            others: ""
+          },
+          developerRequirements: project.developerRequirements || "",
+          designerRequirements: project.designerRequirements || "",
+          marketerRequirements: project.marketerRequirements || "",
+          commercialRequirements: project.commercialRequirements || "",
           techStack: project.techStack || [],
           tags: project.tags || [],
           deadline: project.deadline ? new Date(project.deadline).toISOString().split('T')[0] : "",
@@ -109,6 +154,9 @@ export default function CreateProjectPage() {
             github: project.contactInfo?.github || ""
           }
         })
+        if (project.logo) {
+          setLogoPreview(project.logo)
+        }
       } else {
         toast.error("Failed to load project data")
         router.push("/dashboard")
@@ -120,14 +168,60 @@ export default function CreateProjectPage() {
     }
   }
 
+  const handleLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error('Logo file size must be less than 5MB');
+        return;
+      }
+      
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+
+      setFormData(prev => ({ ...prev, logoFile: file, logo: '' }));
+      setLogoPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
     try {
+      let logoUrl = formData.logo;
+      
+      // If logo file is selected, upload it first
+      if (formData.logoFile) {
+        const uploadFormData = new FormData();
+        uploadFormData.append('logo', formData.logoFile);
+        
+        const uploadResponse = await fetch('/api/upload/project-logo', {
+          method: 'POST',
+          body: uploadFormData,
+        });
+        
+        if (!uploadResponse.ok) {
+          throw new Error('Failed to upload logo');
+        }
+        
+        const uploadData = await uploadResponse.json();
+        logoUrl = uploadData.url;
+      }
+
       const submitData = {
         ...formData,
+        logo: logoUrl,
         teamSize: formData.teamSize ? Number(formData.teamSize) : undefined,
+        teamComposition: {
+          developers: formData.teamComposition.developers ? Number(formData.teamComposition.developers) : undefined,
+          designers: formData.teamComposition.designers ? Number(formData.teamComposition.designers) : undefined,
+          marketers: formData.teamComposition.marketers ? Number(formData.teamComposition.marketers) : undefined,
+          commercials: formData.teamComposition.commercials ? Number(formData.teamComposition.commercials) : undefined,
+          others: formData.teamComposition.others ? Number(formData.teamComposition.others) : undefined,
+        },
         budget: {
           min: formData.budget.min ? Number(formData.budget.min) : undefined,
           max: formData.budget.max ? Number(formData.budget.max) : undefined,
@@ -250,6 +344,68 @@ export default function CreateProjectPage() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="logo">Project Logo</Label>
+                  <div className="space-y-2">
+                    {/* Logo preview */}
+                    {(logoPreview || formData.logo) && (
+                      <div className="flex items-center space-x-2">
+                        <img 
+                          src={logoPreview || formData.logo} 
+                          alt="Logo preview" 
+                          className="w-12 h-12 rounded object-cover border"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setFormData(prev => ({ ...prev, logoFile: null, logo: '' }));
+                            setLogoPreview('');
+                          }}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {/* File upload */}
+                    <div className="space-y-2">
+                      <Label htmlFor="logoFile" className="text-sm text-muted-foreground">
+                        Upload logo file (PNG, JPG, SVG - max 5MB)
+                      </Label>
+                      <Input
+                        id="logoFile"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoFileChange}
+                        className="cursor-pointer"
+                      />
+                    </div>
+                    
+                    {/* Or URL input */}
+                    <div className="space-y-2">
+                      <Label htmlFor="logoUrl" className="text-sm text-muted-foreground">
+                        Or provide logo URL
+                      </Label>
+                      <Input
+                        id="logoUrl"
+                        type="url"
+                        placeholder="https://your-project.com/logo.png"
+                        value={formData.logo}
+                        onChange={(e) => {
+                          setFormData(prev => ({ ...prev, logo: e.target.value }));
+                          if (formData.logoFile) {
+                            setFormData(prev => ({ ...prev, logoFile: null }));
+                            setLogoPreview('');
+                          }
+                          setLogoPreview(e.target.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="description">Description *</Label>
                   <Textarea
                     id="description"
@@ -283,23 +439,100 @@ export default function CreateProjectPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="teamSize">Team Size</Label>
-                    <Input
-                      id="teamSize"
-                      type="number"
-                      min="1"
-                      value={formData.teamSize}
-                      onChange={(e) =>
-                        setFormData(prev => ({
+                {/* Team Composition */}
+                <div className="space-y-4">
+                  <Label className="text-base font-medium">Team Composition</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="developers" className="text-sm">Developers</Label>
+                      <Input
+                        id="developers"
+                        type="number"
+                        min="0"
+                        value={formData.teamComposition.developers}
+                        onChange={(e) => setFormData(prev => ({
                           ...prev,
-                          teamSize: e.target.value === "" ? "" : Number(e.target.value)
-                        }))
-                      }
-                      placeholder="Number of people needed"
-                    />
+                          teamComposition: { ...prev.teamComposition, developers: e.target.value === "" ? "" : Number(e.target.value) }
+                        }))}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="designers" className="text-sm">Designers</Label>
+                      <Input
+                        id="designers"
+                        type="number"
+                        min="0"
+                        value={formData.teamComposition.designers}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          teamComposition: { ...prev.teamComposition, designers: e.target.value === "" ? "" : Number(e.target.value) }
+                        }))}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="marketers" className="text-sm">Marketers</Label>
+                      <Input
+                        id="marketers"
+                        type="number"
+                        min="0"
+                        value={formData.teamComposition.marketers}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          teamComposition: { ...prev.teamComposition, marketers: e.target.value === "" ? "" : Number(e.target.value) }
+                        }))}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="commercials" className="text-sm">Commercials</Label>
+                      <Input
+                        id="commercials"
+                        type="number"
+                        min="0"
+                        value={formData.teamComposition.commercials}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          teamComposition: { ...prev.teamComposition, commercials: e.target.value === "" ? "" : Number(e.target.value) }
+                        }))}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="others" className="text-sm">Others</Label>
+                      <Input
+                        id="others"
+                        type="number"
+                        min="0"
+                        value={formData.teamComposition.others}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          teamComposition: { ...prev.teamComposition, others: e.target.value === "" ? "" : Number(e.target.value) }
+                        }))}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="teamSize" className="text-sm">Total Team Size</Label>
+                      <Input
+                        id="teamSize"
+                        type="number"
+                        min="1"
+                        value={formData.teamSize}
+                        onChange={(e) =>
+                          setFormData(prev => ({
+                            ...prev,
+                            teamSize: e.target.value === "" ? "" : Number(e.target.value)
+                          }))
+                        }
+                        placeholder="Total people needed"
+                      />
+                    </div>
                   </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="difficulty">Difficulty Level *</Label>
                     <Select value={formData.difficulty} onValueChange={(value) => setFormData(prev => ({ ...prev, difficulty: value }))}>
@@ -321,6 +554,53 @@ export default function CreateProjectPage() {
                       onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
                       placeholder="Remote, On-site, or City"
                     />
+                  </div>
+                </div>
+
+                {/* Role-specific Requirements */}
+                <div className="space-y-4">
+                  <Label className="text-base font-medium">Role-specific Requirements</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="developerRequirements">Developer Requirements</Label>
+                      <Textarea
+                        id="developerRequirements"
+                        value={formData.developerRequirements}
+                        onChange={(e) => setFormData(prev => ({ ...prev, developerRequirements: e.target.value }))}
+                        placeholder="What skills do developers need?"
+                        rows={3}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="designerRequirements">Designer Requirements</Label>
+                      <Textarea
+                        id="designerRequirements"
+                        value={formData.designerRequirements}
+                        onChange={(e) => setFormData(prev => ({ ...prev, designerRequirements: e.target.value }))}
+                        placeholder="What design skills are needed?"
+                        rows={3}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="marketerRequirements">Marketer Requirements</Label>
+                      <Textarea
+                        id="marketerRequirements"
+                        value={formData.marketerRequirements}
+                        onChange={(e) => setFormData(prev => ({ ...prev, marketerRequirements: e.target.value }))}
+                        placeholder="What marketing skills are needed?"
+                        rows={3}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="commercialRequirements">Commercial Requirements</Label>
+                      <Textarea
+                        id="commercialRequirements"
+                        value={formData.commercialRequirements}
+                        onChange={(e) => setFormData(prev => ({ ...prev, commercialRequirements: e.target.value }))}
+                        placeholder="What commercial skills are needed?"
+                        rows={3}
+                      />
+                    </div>
                   </div>
                 </div>
 

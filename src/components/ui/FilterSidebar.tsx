@@ -22,9 +22,9 @@ interface FilterSidebarProps {
 }
 
 const categories = [
-  { value: 'web-development', label: 'Web Development' },
-  { value: 'mobile-development', label: 'Mobile Development' },
-  { value: 'ai-ml', label: 'AI & Machine Learning' },
+  { value: 'Software', label: 'Software' },
+  { value: 'Mobile', label: 'Mobile' },
+  { value: 'Web Design', label: 'Web Design' },
   { value: 'data-science', label: 'Data Science' },
   { value: 'blockchain', label: 'Blockchain' },
   { value: 'game-development', label: 'Game Development' },

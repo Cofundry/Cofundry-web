@@ -2,8 +2,25 @@ export interface Project {
   _id?: string;
   title: string;
   description: string;
+  logo?: string; // Project logo URL
   requirements?: string;
+  
+  // Team composition
   teamSize?: number;
+  teamComposition?: {
+    developers?: number;
+    designers?: number;
+    marketers?: number;
+    commercials?: number;
+    others?: number;
+  };
+  
+  // Role-specific requirements
+  developerRequirements?: string;
+  designerRequirements?: string;
+  marketerRequirements?: string;
+  commercialRequirements?: string;
+  
   techStack?: string[];
   tags?: string[];
   deadline?: Date | string;

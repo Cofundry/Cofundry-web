@@ -308,9 +308,12 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
-          <p className="text-muted-foreground">Manage your projects and applications</p>
+        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
+            <p className="text-muted-foreground">Manage your projects and applications</p>
+          </div>
+    
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -324,7 +327,7 @@ export default function DashboardPage() {
             </TabsTrigger>
             <TabsTrigger value="applications" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              Applications ({applicationsTotal})
+              Applications 
             </TabsTrigger>
           </TabsList>
 

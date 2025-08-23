@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <title>⭐ Cofundry - Where Students & Developers Build Together</title>
+        <title> Cofundry - Where Students & Developers Build Together</title>
         <meta name="description" content="Cofundry is the premier platform for students, SaaS developers, and professionals to collaborate on innovative projects. Find teammates, showcase your work, and build the future together." />
         <meta name="keywords" content="student collaboration, SaaS projects, team building, project collaboration, student projects, startup collaboration, tech projects, remote collaboration, project management, student networking, SaaS development, collaborative platform, project showcase, team formation, innovation platform" />
         <meta name="author" content="Cofundry Team" />
@@ -36,16 +36,16 @@ export default function RootLayout({
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://cofundry.com" />
-        <meta property="og:title" content="⭐ Cofundry - Where Students & Developers Build Together" />
+        <meta property="og:title" content=" Cofundry - Where Students & Developers Build Together" />
         <meta property="og:description" content="Cofundry is the premier platform for students, SaaS developers, and professionals to collaborate on innovative projects. Find teammates, showcase your work, and build the future together." />
         <meta property="og:image" content="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" />
-        <meta property="og:site_name" content="⭐ Cofundry" />
+        <meta property="og:site_name" content=" Cofundry" />
         <meta property="og:locale" content="en_US" />
         
         {/* Twitter */}
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:url" content="https://cofundry.com" />
-        <meta property="twitter:title" content="⭐ Cofundry - Where Students & Developers Build Together" />
+        <meta property="twitter:title" content=" Cofundry - Where Students & Developers Build Together" />
         <meta property="twitter:description" content="Cofundry is the premier platform for students, SaaS developers, and professionals to collaborate on innovative projects." />
         <meta property="twitter:image" content="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" />
         <meta property="twitter:creator" content="@cofundry" />
@@ -65,15 +65,15 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         
         {/* Favicon and app icons - Force refresh with cache busting */}
-        <link rel="icon" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png?v=2" type="image/png" />
-        <link rel="shortcut icon" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png?v=2" type="image/png" />
-        <link rel="apple-touch-icon" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png?v=2" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png?v=2" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png?v=2" />
+        <link rel="icon" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" type="image/png" />
+        <link rel="shortcut icon" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" />
         <link rel="manifest" href="/site.webmanifest" />
         
         {/* Force favicon refresh */}
-        <link rel="icon" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png?v=2" />
+        <link rel="icon" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Providers>

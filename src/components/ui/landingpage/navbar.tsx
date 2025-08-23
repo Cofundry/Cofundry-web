@@ -53,8 +53,8 @@ const Navbar1 = ({
   menu = [
     { title: "Home", url: "/" },
     { title: "Projects", url: "/projects" },
-    { title: "How It Works", url: "#how-it-works" },
-    { title: "About", url: "#about" },
+    { title: "Products", url: "/saas" },
+
   ],
   auth = {
     login: { title: "Login", url: "/login" },

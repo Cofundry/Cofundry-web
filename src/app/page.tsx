@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { useLoading } from "@/components/ui/LoadingProvider"
 
+
 interface ProjectsResponse {
   projects: Project[]
   pagination: {
@@ -107,7 +108,7 @@ export default function HomePage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
-            "name": "⭐ Cofundry",
+            "name": " Cofundry",
             "description": "The premier platform for students, SaaS developers, and professionals to collaborate on innovative projects",
             "url": "https://cofundry.com",
             "potentialAction": {
@@ -117,7 +118,7 @@ export default function HomePage() {
             },
             "publisher": {
               "@type": "Organization",
-              "name": "⭐ Cofundry",
+              "name": " Cofundry",
               "logo": {
                 "@type": "ImageObject",
                 "url": "https://cofundry.com/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png"
@@ -216,6 +217,9 @@ export default function HomePage() {
               </div>
             </div>
           </section>
+
+
+
         </main>
 
         <footer>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDB } from '@/lib/mongodb';
-import { Project } from '@/lib/models/Project';
+import { SaaS } from '@/lib/models/SaaS';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/jwt';
 import { ObjectId } from 'mongodb';
@@ -34,102 +34,96 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '9');
+    const limit = parseInt(searchParams.get('limit') || '12');
     const search = searchParams.get('search') || '';
-    const name = searchParams.get('name') || '';
     const category = searchParams.get('category') || '';
-    const difficulty = searchParams.get('difficulty') || '';
-    const location = searchParams.get('location') || '';
-    const authorId = searchParams.get('authorId') || '';
+    const sortBy = searchParams.get('sortBy') || 'votes'; // votes, todayVotes, createdAt
+    const status = searchParams.get('status') || 'approved'; // pending, approved, rejected, all
 
     const db = await getDB();
-    const projectsCollection = db.collection('projects');
+    const saasCollection = db.collection('saas');
 
     // Build filter object
-    const filter: any = { status: 'open' };
+    const filter: any = {};
+    
+    // Only add status filter if not "all"
+    if (status && status !== 'all') {
+      filter.status = status;
+    }
     
     if (search) {
       const escaped = escapeRegex(search);
       filter.$or = [
-        { title: { $regex: escaped, $options: 'i' } },
+        { name: { $regex: escaped, $options: 'i' } },
         { description: { $regex: escaped, $options: 'i' } },
         { tags: { $elemMatch: { $regex: escaped, $options: 'i' } } }
       ];
     }
 
-    if (name) {
-      const escaped = escapeRegex(name);
-      filter.title = { $regex: `^${escaped}`, $options: 'i' };
-    }
-    
     if (category) {
       const escaped = escapeRegex(category);
       filter.category = { $regex: `^${escaped}$`, $options: 'i' };
     }
-    
-    if (difficulty) {
-      const escaped = escapeRegex(difficulty);
-      filter.difficulty = { $regex: `^${escaped}$`, $options: 'i' };
-    }
-    
-    if (location) {
-      const escaped = escapeRegex(location);
-      filter.location = { $regex: escaped, $options: 'i' };
-    }
-    
-    if (authorId) {
-      filter.authorId = authorId;
+
+    // Build sort object
+    let sort: any = {};
+    if (sortBy === 'votes') {
+      sort = { votes: -1, createdAt: -1 };
+    } else if (sortBy === 'todayVotes') {
+      sort = { todayVotes: -1, votes: -1 };
+    } else if (sortBy === 'createdAt') {
+      sort = { createdAt: -1 };
     }
 
     // Get total count for pagination
-    const totalProjects = await projectsCollection.countDocuments(filter);
-    const totalPages = Math.max(1, Math.ceil(totalProjects / limit));
+    const totalSaas = await saasCollection.countDocuments(filter);
+    const totalPages = Math.max(1, Math.ceil(totalSaas / limit));
 
-    // Get projects with pagination
-    const projects = await projectsCollection
+    // Get SaaS with pagination
+    const saasList = await saasCollection
       .find(filter)
-      .sort({ createdAt: -1 })
+      .sort(sort)
       .skip((page - 1) * limit)
       .limit(limit)
       .toArray();
 
     // Enrich missing author fields from users collection
-    const missing = projects.filter(p => (!p.authorName || !p.authorAvatar) && typeof p.authorId === 'string');
+    const missing = saasList.filter(s => (!s.authorName || !s.authorAvatar) && typeof s.authorId === 'string');
     if (missing.length > 0) {
-      const authorIds = Array.from(new Set(missing.map((p: any) => p.authorId).filter(Boolean)));
+      const authorIds = Array.from(new Set(missing.map((s: any) => s.authorId).filter(Boolean)));
       const objectIds = authorIds
         .filter((id: string) => ObjectId.isValid(id))
         .map((id: string) => new ObjectId(id));
       if (objectIds.length > 0) {
         const users = await db.collection('users').find({ _id: { $in: objectIds } }).toArray();
         const map = new Map(users.map((u: any) => [u._id.toString(), u]));
-        for (const p of projects as any[]) {
-          const uid = typeof p.authorId === 'string' ? p.authorId : undefined;
+        for (const s of saasList as any[]) {
+          const uid = typeof s.authorId === 'string' ? s.authorId : undefined;
           if (uid && map.has(uid)) {
             const u = map.get(uid);
-            p.authorName = p.authorName || u?.name || 'Anonymous User';
-            p.authorEmail = p.authorEmail || u?.email || '';
-            p.authorAvatar = p.authorAvatar || u?.avatar || '';
+            s.authorName = s.authorName || u?.name || 'Anonymous User';
+            s.authorEmail = s.authorEmail || u?.email || '';
+            s.authorAvatar = s.authorAvatar || u?.avatar || '';
           }
         }
       }
     }
 
     return NextResponse.json({
-      projects,
+      saas: saasList,
       pagination: {
         currentPage: page,
         totalPages,
-        totalProjects,
+        totalSaas,
         hasNextPage: page < totalPages,
         hasPrevPage: page > 1
       }
     });
 
   } catch (error) {
-    console.error('Error fetching projects:', error);
+    console.error('Error fetching SaaS:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch projects' },
+      { error: 'Failed to fetch SaaS' },
       { status: 500 }
     );
   }
@@ -148,27 +142,16 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const {
-      title,
+      name,
       description,
+      url,
       logo,
-      requirements,
-      teamSize,
-      teamComposition,
-      developerRequirements,
-      designerRequirements,
-      marketerRequirements,
-      commercialRequirements,
-      techStack,
-      tags,
-      deadline,
-      budget,
-      location,
+      features,
       category,
-      difficulty,
-      contactInfo
+      tags
     } = body;
 
-    if (!title || !description || !category || !difficulty) {
+    if (!name || !description || !url || !logo || !category) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -177,51 +160,42 @@ export async function POST(request: NextRequest) {
 
     const db = await getDB();
     const users = db.collection('users');
-    const projectsCollection = db.collection('projects');
+    const saasCollection = db.collection('saas');
 
-    // pull latest author info from DB
+    // Get latest author info from DB
     const author = await users.findOne({ _id: new ObjectId(user.id) });
 
-    const project = {
-      title,
+    const saas = {
+      name,
       description,
-      logo: logo || undefined,
-      requirements: requirements || '',
-      teamSize: teamSize || undefined,
-      teamComposition: teamComposition || undefined,
-      developerRequirements: developerRequirements || undefined,
-      designerRequirements: designerRequirements || undefined,
-      marketerRequirements: marketerRequirements || undefined,
-      commercialRequirements: commercialRequirements || undefined,
-      techStack: techStack || [],
-      tags: tags || [],
-      deadline: deadline || undefined,
-      budget: budget || undefined,
-      location: location || 'Remote',
+      url,
+      logo,
+      features: features || [],
       category,
-      difficulty,
+      tags: tags || [],
       authorId: user.id,
       authorName: author?.name || user.name || 'Anonymous User',
-      authorEmail: author?.email || user.email,
+      authorEmail: author?.email || user.email || '',
       authorAvatar: author?.avatar || '',
-      status: 'open',
+      // Auto-approve all new submissions
+      status: 'approved',
+      votes: 0,
+      todayVotes: 0,
       createdAt: new Date(),
-      updatedAt: new Date(),
-      contactInfo: contactInfo || {},
-      attachments: []
+      updatedAt: new Date()
     } as any;
 
-    const result = await projectsCollection.insertOne(project);
+    const result = await saasCollection.insertOne(saas);
 
     return NextResponse.json({
-      message: 'Project created successfully',
-      projectId: result.insertedId
+      message: 'SaaS submitted successfully',
+      saasId: result.insertedId
     });
 
   } catch (error) {
-    console.error('Error creating project:', error);
+    console.error('Error submitting SaaS:', error);
     return NextResponse.json(
-      { error: 'Failed to create project' },
+      { error: 'Failed to submit SaaS' },
       { status: 500 }
     );
   }

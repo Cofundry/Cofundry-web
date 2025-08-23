@@ -5,11 +5,13 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ProjectLogo } from "@/components/ui/ProjectLogo"
 import type { Project } from "@/lib/models/Project"
 import { CommentModal } from "@/components/ui/CommentModal"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { toast } from "sonner"
+import { Label } from "@/components/ui/label"
 
 interface ProjectCardProps {
   project: Project;
@@ -184,13 +186,18 @@ export function ProjectCard({ project, onApply, currentUser, showEditDelete, onE
 
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg md:text-xl font-bold line-clamp-2 leading-tight">
-              {displayTitle}
-            </CardTitle>
-            <CardDescription className="text-sm md:text-base text-muted-foreground line-clamp-2 mt-2 leading-relaxed">
-              {displayDescription}
-            </CardDescription>
+          <div className="flex items-center space-x-3 min-w-0 flex-1">
+            {/* Project Logo */}
+            <ProjectLogo logo={project.logo} title={displayTitle} />
+            
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-lg md:text-xl font-bold line-clamp-2 leading-tight">
+                {displayTitle}
+              </CardTitle>
+              <CardDescription className="text-sm md:text-base text-muted-foreground line-clamp-2 mt-2 leading-relaxed">
+                {displayDescription}
+              </CardDescription>
+            </div>
           </div>
         </div>
       </CardHeader>
@@ -230,12 +237,63 @@ export function ProjectCard({ project, onApply, currentUser, showEditDelete, onE
 
         {/* Project Details */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm md:text-base">
-          {typeof teamSize === 'number' && (
+          {/* Team Composition Display */}
+          {project.teamComposition && (
+            <>
+              {project.teamComposition.developers && project.teamComposition.developers > 0 && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Code className="h-4 w-4 md:h-5 md:w-5" />
+                  <span className="font-medium">{project.teamComposition.developers} Developer{project.teamComposition.developers > 1 ? 's' : ''}</span>
+                </div>
+              )}
+              {project.teamComposition.designers && project.teamComposition.designers > 0 && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <div className="w-4 h-4 md:w-5 md:h-5 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-full h-full">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+                    </svg>
+                  </div>
+                  <span className="font-medium">{project.teamComposition.designers} Designer{project.teamComposition.designers > 1 ? 's' : ''}</span>
+                </div>
+              )}
+              {project.teamComposition.marketers && project.teamComposition.marketers > 0 && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <div className="w-4 h-4 md:w-5 md:h-5 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-full h-full">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                    </svg>
+                  </div>
+                  <span className="font-medium">{project.teamComposition.marketers} Marketer{project.teamComposition.marketers > 1 ? 's' : ''}</span>
+                </div>
+              )}
+              {project.teamComposition.commercials && project.teamComposition.commercials > 0 && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <div className="w-4 h-4 md:w-5 md:h-5 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-full h-full">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                    </svg>
+                  </div>
+                  <span className="font-medium">{project.teamComposition.commercials} Commercial{project.teamComposition.commercials > 1 ? 's' : ''}</span>
+                </div>
+              )}
+              {project.teamComposition.others && project.teamComposition.others > 0 && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Users className="h-4 w-4 md:h-5 md:w-5" />
+                  <span className="font-medium">{project.teamComposition.others} Other{project.teamComposition.others > 1 ? 's' : ''}</span>
+                </div>
+              )}
+            </>
+          )}
+          
+          {/* Legacy team size display */}
+          {typeof teamSize === 'number' && teamSize > 0 && !project.teamComposition && (
             <div className="flex items-center gap-2 text-muted-foreground">
               <Users className="h-4 w-4 md:h-5 md:w-5" />
               <span className="font-medium">{teamSize} people</span>
             </div>
           )}
+          
           {displayLocation && (
             <div className="flex items-center gap-2 text-muted-foreground">
               <MapPin className="h-4 w-4 md:h-5 md:w-5" />
@@ -258,10 +316,37 @@ export function ProjectCard({ project, onApply, currentUser, showEditDelete, onE
           )}
         </div>
 
+        {/* Role-specific Requirements */}
+        {(project.developerRequirements || project.designerRequirements || project.marketerRequirements || project.commercialRequirements) && (
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-foreground">Role Requirements:</Label>
+            {project.developerRequirements && (
+              <div className="text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">Developers:</span> {project.developerRequirements}
+              </div>
+            )}
+            {project.designerRequirements && (
+              <div className="text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">Designers:</span> {project.designerRequirements}
+              </div>
+            )}
+            {project.marketerRequirements && (
+              <div className="text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">Marketers:</span> {project.marketerRequirements}
+              </div>
+            )}
+            {project.commercialRequirements && (
+              <div className="text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">Commercials:</span> {project.commercialRequirements}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Requirements Preview */}
         {(project.requirements || project.description) && (
           <div className="text-sm md:text-base text-muted-foreground">
-            <span className="font-medium">Requirements:</span>
+            <span className="font-medium">General Requirements:</span>
             <p className="line-clamp-2 mt-2 leading-relaxed">{displayRequirements}</p>
           </div>
         )}
