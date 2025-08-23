@@ -23,7 +23,17 @@ export default function SaaSCard({ saas, onVoteChange, showVoteButton = true }: 
   const [todayVotes, setTodayVotes] = useState(saas.todayVotes || 0);
   const [hasVoted, setHasVoted] = useState(false);
   const [commentOpen, setCommentOpen] = useState(false);
-  const [comments, setComments] = useState<any[]>([]);
+  const [comments, setComments] = useState<Array<{
+    _id: string;
+    saasId: string;
+    authorId: string;
+    authorName: string;
+    authorEmail: string;
+    authorAvatar?: string;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+  }>>([]);
   const [loadingComments, setLoadingComments] = useState(false);
   const [currentUser, setCurrentUser] = useState<{ name?: string; email?: string; avatar?: string } | null>(null);
   const router = useRouter();
@@ -122,8 +132,9 @@ export default function SaaSCard({ saas, onVoteChange, showVoteButton = true }: 
     });
   };
 
-  async function fetchComments() {
+  const fetchComments = async () => {
     if (!saas._id) return;
+    
     setLoadingComments(true);
     try {
       const res = await fetch(`/api/saas/${saas._id}/comments`);
@@ -132,11 +143,11 @@ export default function SaaSCard({ saas, onVoteChange, showVoteButton = true }: 
         setComments(data.comments || []);
       }
     } catch (error) {
-      console.error('Error fetching comments:', error);
-      toast.error('Failed to load comments');
+      console.error("Error fetching comments:", error);
+      toast.error("Failed to load comments");
     }
     setLoadingComments(false);
-  }
+  };
 
   return (
     <Card className="h-full flex flex-col hover:shadow-lg transition-shadow">
@@ -276,11 +287,20 @@ export default function SaaSCard({ saas, onVoteChange, showVoteButton = true }: 
             toast.error('Failed to add comment');
           }
         }}
-        comments={comments}
+        comments={comments.map(comment => ({
+          _id: comment._id,
+          projectId: comment.saasId,
+          userId: comment.authorId,
+          userName: comment.authorName,
+          userEmail: comment.authorEmail,
+          userAvatar: comment.authorAvatar,
+          text: comment.content,
+          createdAt: comment.createdAt,
+          updatedAt: comment.updatedAt
+        }))}
         currentUser={currentUser?.name || currentUser?.email}
         currentUserAvatar={currentUser?.avatar}
         projectId={saas._id || ''}
-        saasMode={true}
         loading={loadingComments}
         refetchComments={async () => fetchComments()}
       />
