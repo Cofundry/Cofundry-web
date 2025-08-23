@@ -155,8 +155,8 @@ export function CommentModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-w-[95vw] w-full max-h-[90vh] p-0 sm:p-6">
-        <DialogHeader className="sticky top-0 bg-background z-10 px-4 sm:px-0 pb-4 sm:pb-0">
+      <DialogContent className="sm:max-w-2xl max-w-[95vw] w-full max-h-[90vh] p-0 flex flex-col">
+        <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-4">
           <DialogTitle className="text-lg sm:text-xl font-semibold">
             Comments ({comments.length})
           </DialogTitle>
@@ -165,7 +165,7 @@ export function CommentModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto px-4 sm:px-0">
+        <div className="flex-1 overflow-y-auto px-6 min-h-0">
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <div className="flex items-center gap-2">
@@ -254,7 +254,7 @@ export function CommentModal({
         </div>
 
         {onSubmit && (
-          <DialogFooter className="sticky bottom-0 bg-background border-t pt-4 px-4 sm:px-0">
+          <DialogFooter className="flex-shrink-0 border-t pt-4 px-6 pb-6">
             <form onSubmit={handleSubmit} className="w-full space-y-3">
               <div className="flex gap-2">
                 <Textarea
