@@ -15,7 +15,7 @@ interface SEOHeadProps {
 }
 
 export default function SEOHead({
-  title = "⭐ Cofundry - Where Students & Developers Build Together",
+  title = "Cofundry - Where Students & Developers Build Together",
   description = "Cofundry is the premier platform for students, SaaS developers, and professionals to collaborate on innovative projects. Find teammates, showcase your work, and build the future together.",
   keywords = [
     "student collaboration",
@@ -43,8 +43,8 @@ export default function SEOHead({
   section,
   tags = []
 }: SEOHeadProps) {
-  const fullTitle = title.includes("⭐ Cofundry") ? title : `${title} | ⭐ Cofundry`
-  const fullKeywords = [...keywords, "⭐ Cofundry", "collaboration", "projects"]
+  const fullTitle = title.includes("Cofundry") ? title : `${title} | Cofundry`
+  const fullKeywords = [...keywords, "Cofundry", "collaboration", "projects"]
   
   return (
     <Head>
@@ -64,7 +64,7 @@ export default function SEOHead({
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={image} />
-      <meta property="og:site_name" content="⭐ Cofundry" />
+      <meta property="og:site_name" content="Cofundry" />
       <meta property="og:locale" content="en_US" />
       
       {/* Twitter */}
