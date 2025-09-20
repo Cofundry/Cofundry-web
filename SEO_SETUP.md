@@ -158,3 +158,4 @@ For SEO-related questions or improvements, refer to:
 ---
 
 **Note**: This SEO implementation follows current best practices and is designed to improve search engine visibility for Cofundry's target audience of students, developers, and professionals seeking collaboration opportunities.
+
