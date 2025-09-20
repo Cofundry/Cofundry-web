@@ -84,9 +84,12 @@ async function getProject(id: string) {
 }
 
 /* ------------------------------ page ------------------------------ */
-export default async function ProjectDetailsPage({ params }: { params: { id: string } }) {
-    const data = await getProject(params.id)
-    if (!data) notFound()
+export default async function ProjectDetailsPage(
+    { params }: { params: Promise<{ id: string }> }
+) {
+    const { id } = await params;
+    const data = await getProject(id);
+    if (!data) notFound();
 
     // API returns raw project doc
     const project = data as any
