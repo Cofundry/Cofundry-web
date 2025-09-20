@@ -127,7 +127,7 @@ const [Loading, setLoading] = useState(false);
             <div className="grid gap-3">
               <Label htmlFor="email">Email</Label>
               <Input
-              placeholder="contact@kreatinc.com"
+              placeholder="contact@cofundry.com"
                 id="email"
                 type="email"
                 value={formData.email}
