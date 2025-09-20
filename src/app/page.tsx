@@ -13,6 +13,8 @@ import { homeFaqs } from "@/lib/types/landing-data"
 import { FeaturedProjects } from "@/components/ui/landingpage/featured-projects"
 import { ContactSection } from "@/components/ui/landingpage/contact"
 import { BackToTop } from "@/components/ui/landingpage/backtoup"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
 
 interface ProjectsResponse {
   projects: Project[]
@@ -159,7 +161,8 @@ export default function HomePage() {
         />
 
         <BackToTop threshold={200} />
-
+        <Analytics />
+        <SpeedInsights />
       </div>
     </>
   )
