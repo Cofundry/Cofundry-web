@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDB } from '@/lib/mongodb';
-import { Project } from '@/lib/models/Project';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/jwt';
 import { ObjectId } from 'mongodb';
