@@ -13,26 +13,13 @@ import {
 
 /* -------------------- utils: base url + formatting -------------------- */
 async function getBaseUrl() {
-    // First priority: explicit APP_URL
-    if (process.env.NEXT_PUBLIC_APP_URL) {
-        return process.env.NEXT_PUBLIC_APP_URL;
+    if (process.env.NODE_ENV === 'production') {
+        // In production, use relative URLs to avoid CORS and URL issues
+        return '';
     }
 
-    // Second priority: Vercel deployment URL
-    if (process.env.VERCEL_URL) {
-        return `https://${process.env.VERCEL_URL}`;
-    }
-
-    // Third priority: Request headers for local dev
-    const h = await headers();
-    const host = h.get("x-forwarded-host") ?? h.get("host");
-    if (host) {
-        const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
-        return `${protocol}://${host}`;
-    }
-
-    // Fallback for local development
-    return "http://localhost:3000";
+    // For development
+    return 'http://localhost:3000';
 }
 
 
@@ -76,16 +63,16 @@ function safeText(v: any, fallback = "—") {
 async function getProject(id: string) {
     try {
         const base = await getBaseUrl();
-        console.log('Base URL:', base); // Debug URL construction
 
+        // Get headers for auth
         const h = await headers();
         const cookie = h.get("cookie");
         const authorization = h.get("authorization");
 
-        const url = `${base}/api/projects/${encodeURIComponent(id)}`;
-        console.log('Fetching from:', url); // Debug final URL
+        // In production, use relative URL to avoid CORS issues
+        const url = `/api/projects/${encodeURIComponent(id)}`;
 
-        const res = await fetch(url, {
+        const res = await fetch(`${base}${url}`, {
             cache: "no-store",
             headers: {
                 'Content-Type': 'application/json',
@@ -115,23 +102,49 @@ async function getProject(id: string) {
 }
 
 /* ------------------------------ page ------------------------------ */
-interface PageProps {
-    params: {
-        id: string;
-    };
-    searchParams: { [key: string]: string | string[] | undefined };
+type RowProps = {
+    icon: React.ReactNode;
+    label: string;
+    value?: string | null;
+};
+
+function ProjectRow({ icon, label, value }: RowProps) {
+    return (
+        <div className="flex items-center gap-2 text-sm">
+            {icon}
+            <span className="font-medium">{label}:</span>
+            <span className="opacity-80">{value || 'Not specified'}</span>
+        </div>
+    );
 }
 
 export default async function ProjectDetailsPage({
     params,
-    searchParams,
-}: PageProps) {
+}: {
+    params: { id: string }
+}) {
     if (!params?.id) {
         console.error('No project ID provided');
         notFound();
     }
 
-    const data = await getProject(params.id);
+    let projectData;
+    try {
+        projectData = await getProject(params.id);
+        
+        if (!projectData || typeof projectData !== 'object') {
+            console.error('Project not found or invalid data');
+            notFound();
+        }
+    } catch (error) {
+        console.error('Error fetching project:', error);
+        notFound();
+    }
+
+    // Process the project data
+    const project = projectData;
+    const title = project?.title ?? project?.name ?? "Project";
+    const description = project?.description ?? project?.summary ?? "No description provided.";
     if (!data) {
         console.error('Project not found:', params.id);
         notFound();
@@ -464,7 +477,7 @@ export default async function ProjectDetailsPage({
 /* -------------------------- tiny helpers -------------------------- */
 
 // Small row for sidebar details
-function Row({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) {
+function Row({ icon, label, value }: { icon: React.ReactNode, label: string, value: string | null | undefined }) {
     return (
         <div className="flex items-start gap-2">
             <div className="mt-0.5">{icon}</div>
