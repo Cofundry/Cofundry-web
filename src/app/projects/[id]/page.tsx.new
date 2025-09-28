@@ -1,0 +1,150 @@
+import { notFound } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Navbar1 } from "@/components/ui/landingpage/navbar"
+import Footer7 from "@/components/ui/landingpage/footer"
+import {
+    Tag, DollarSign, CalendarDays, MapPin, Users, Globe
+} from "lucide-react"
+
+function formatDate(date: string | null | undefined) {
+    if (!date) return "Not specified"
+    return new Date(date).toLocaleDateString()
+}
+
+function formatBudget(budget: any) {
+    if (!budget) return "Not specified"
+    if (typeof budget === "string") return budget
+    if (typeof budget === "number") return `$${budget.toLocaleString()}`
+    return "Not specified"
+}
+
+async function getProject(id: string) {
+    try {
+        const res = await fetch(`/api/projects/${id}`, {
+            cache: 'no-store',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        if (!res.ok) return null
+        return res.json()
+    } catch (error) {
+        console.error('Error fetching project:', error)
+        return null
+    }
+}
+
+export default async function Page({ params }: { params: { id: string } }) {
+    if (!params.id) {
+        notFound()
+    }
+
+    const project = await getProject(params.id)
+    if (!project) {
+        notFound()
+    }
+
+    const displayData = {
+        title: project.title || project.name || "Untitled Project",
+        description: project.description || project.summary || "No description provided",
+        category: project.category || "Not specified",
+        difficulty: project.difficulty || "Not specified",
+        location: project.location || "Not specified",
+        budget: formatBudget(project.budget),
+        deadline: formatDate(project.deadline),
+        created: formatDate(project.createdAt),
+        status: project.status || "open",
+        tags: Array.isArray(project.tags) ? project.tags : [],
+        tech: Array.isArray(project.techStack) ? project.techStack : [],
+        requirements: project.requirements || "",
+        teamSize: project.teamSize?.toString() || "Not specified"
+    }
+
+    return (
+        <main className="min-h-screen bg-background">
+            <Navbar1 />
+            
+            <div className="container px-4 md:px-6 py-6">
+                <div className="max-w-4xl mx-auto space-y-8">
+                    <div>
+                        <h1 className="text-3xl font-bold mb-4">{displayData.title}</h1>
+                        <p className="text-lg opacity-90">{displayData.description}</p>
+                    </div>
+
+                    <div className="grid gap-6 md:grid-cols-2">
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2">
+                                <Tag className="h-4 w-4" />
+                                <span>Category:</span>
+                                <span className="opacity-80">{displayData.category}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <DollarSign className="h-4 w-4" />
+                                <span>Budget:</span>
+                                <span className="opacity-80">{displayData.budget}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <CalendarDays className="h-4 w-4" />
+                                <span>Deadline:</span>
+                                <span className="opacity-80">{displayData.deadline}</span>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2">
+                                <MapPin className="h-4 w-4" />
+                                <span>Location:</span>
+                                <span className="opacity-80">{displayData.location}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Users className="h-4 w-4" />
+                                <span>Team Size:</span>
+                                <span className="opacity-80">{displayData.teamSize}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Globe className="h-4 w-4" />
+                                <span>Status:</span>
+                                <span className="opacity-80">{displayData.status}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {displayData.tags.length > 0 && (
+                        <div className="space-y-2">
+                            <h3 className="font-medium">Tags</h3>
+                            <div className="flex flex-wrap gap-2">
+                                {displayData.tags.map((tag: string) => (
+                                    <Badge key={tag} variant="secondary">{tag}</Badge>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {displayData.tech.length > 0 && (
+                        <div className="space-y-2">
+                            <h3 className="font-medium">Tech Stack</h3>
+                            <div className="flex flex-wrap gap-2">
+                                {displayData.tech.map((tech: string) => (
+                                    <Badge key={tech} variant="outline">{tech}</Badge>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {displayData.requirements && (
+                        <div className="space-y-2">
+                            <h3 className="font-medium">Requirements</h3>
+                            <p className="opacity-90">{displayData.requirements}</p>
+                        </div>
+                    )}
+
+                    <div className="flex justify-end gap-4">
+                        <Button variant="outline">Contact</Button>
+                        <Button>Apply Now</Button>
+                    </div>
+                </div>
+            </div>
+
+            <Footer7 />
+        </main>
+    )
+}

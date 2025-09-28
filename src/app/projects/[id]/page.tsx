@@ -1,15 +1,11 @@
-"use server"
-
-import Link from "next/link"
 import { notFound } from "next/navigation"
-import { headers } from "next/headers"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Navbar1 } from "@/components/ui/landingpage/navbar"
 import Footer7 from "@/components/ui/landingpage/footer"
 import {
-    Layers, Gauge, MapPin, DollarSign, CalendarDays, Tag, Users, User, Code2,
-    Briefcase, Clock, Globe, ShieldCheck, Sparkles
+    Tag, DollarSign, CalendarDays, MapPin, Users, Globe,
+    Layers, Gauge, User, Code2, Briefcase, Clock, ShieldCheck, Sparkles
 } from "lucide-react"
 
 type ProjectRowProps = {
@@ -51,21 +47,11 @@ function formatBudget(b: any): string {
 
 async function getProject(id: string) {
     try {
-        // In production, use relative URLs
-        const url = `/api/projects/${encodeURIComponent(id)}`
-        
-        // Get headers for auth
-        const h = await headers()
-        const cookie = h.get("cookie")
-        const authorization = h.get("authorization")
-
-        const res = await fetch(url, {
+        const res = await fetch(`/api/projects/${encodeURIComponent(id)}`, {
             cache: "no-store",
             headers: {
-                'Content-Type': 'application/json',
-                ...(cookie ? { cookie } : {}),
-                ...(authorization ? { authorization } : {}),
-            },
+                'Content-Type': 'application/json'
+            }
         })
 
         if (!res.ok) {
@@ -81,15 +67,14 @@ async function getProject(id: string) {
     }
 }
 
-type PageProps = {
-    params: Promise<{ id: string }>;
-    searchParams: { [key: string]: string | string[] | undefined };
+interface Props {
+    params: { id: string }
 }
 
 export default async function ProjectDetailsPage({
     params,
-}: PageProps) {
-    const { id } = await params;
+}: Props) {
+    const { id } = params;
     
     if (!id) {
         console.error('No project ID provided')
