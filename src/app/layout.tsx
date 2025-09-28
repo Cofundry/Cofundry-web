@@ -24,10 +24,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <title> Cofundry - Where Students & Developers Build Together</title>
+        <title>Cofundry - Where Students & Developers Build Together</title>
         <meta name="description" content="Cofundry is the premier platform for students, SaaS developers, and professionals to collaborate on innovative projects. Find teammates, showcase your work, and build the future together." />
         <meta name="keywords" content="student collaboration, SaaS projects, team building, project collaboration, student projects, startup collaboration, tech projects, remote collaboration, project management, student networking, SaaS development, collaborative platform, project showcase, team formation, innovation platform" />
         <meta name="author" content="Cofundry Team" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/site.webmanifest" />
         <meta name="robots" content="index, follow" />
         
         {/* Canonical URL */}
