@@ -31,6 +31,11 @@ function getProjectId(p: any): string {
     return String(raw)
 }
 
+// Fallback slugify used when an id is missing
+function slugify(text: string) {
+    return String(text || "project").toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+}
+
 function getProjectKey(p: any): string {
     return getProjectId(p) || `${p?.title ?? p?.name ?? "project"}-${p?.updatedAt ?? Math.random()}`
 }
@@ -151,7 +156,7 @@ export function FeaturedProjects({
 
 /* --- Futuristic compact card (logo-first) --- */
 function CardPreview({ project }: { project: any }) {
-    const id = getProjectId(project)
+    const id = getProjectId(project) || slugify(project?.title ?? project?.name ?? 'project')
     const title = project?.title ?? project?.name ?? "Untitled project"
     const desc = project?.shortDescription ?? project?.summary ?? project?.description ?? ""
     const category = project?.category

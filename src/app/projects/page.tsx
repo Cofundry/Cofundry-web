@@ -35,6 +35,8 @@ function getProjectId(p: any): string {
   return String(raw)
 }
 
+// ...existing slugify defined above
+
 /** Deterministic (SSR/CSR-safe) date format: YYYY-MM-DD */
 function formatDateUTC(value?: string) {
   if (!value) return "—"
@@ -65,6 +67,11 @@ function formatBudget(b: any): string | null {
     try { return JSON.stringify(b) } catch { return String(b) }
   }
   return String(b)
+}
+
+// Fallback slugify used when an id is missing
+function slugify(text: string) {
+  return String(text || "project").toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 }
 
 /* -------------------------------- Page ---------------------------------- */
@@ -437,8 +444,8 @@ function hashH(str: string) {
 
 /* ---- Card (more data, still clean) ---- */
 function ProjectCardFuturistic({ project }: { project: any }) {
-  const id = getProjectId(project)
   const title = project?.title ?? project?.name ?? "Untitled project"
+  const id = getProjectId(project) || slugify(title)
   const desc = project?.shortDescription ?? project?.summary ?? project?.description ?? ""
   const category = project?.category
   const difficulty = project?.difficulty

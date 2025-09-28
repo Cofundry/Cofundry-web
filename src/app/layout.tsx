@@ -46,9 +46,9 @@ export default function RootLayout({
         <meta property="og:description" content="Première plateforme marocaine pour les PFE, stages et projets innovants. Connectez-vous avec les meilleures universités et startups du Maroc. Trouvez votre projet de fin d'études idéal. | منصة للطلاب والشركات الناشئة في المغرب" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://cofundry.com" />
-        <meta property="og:image" content="https://cofundry.com/og-image.png" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
+  <meta property="og:image" content="https://cofundry.com/og-image.svg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
         
         {/* Twitter Card Meta Tags */}
         <meta name="twitter:card" content="summary_large_image" />
@@ -96,16 +96,12 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         
-        {/* Favicon and app icons - Force refresh with cache busting */}
-        <link rel="icon" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" type="image/png" />
-        <link rel="shortcut icon" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" />
-        <link rel="manifest" href="/site.webmanifest" />
-        
-        {/* Force favicon refresh */}
-        <link rel="icon" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" />
+  {/* Favicon and app icons */}
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+  <link rel="manifest" href="/site.webmanifest" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Providers>

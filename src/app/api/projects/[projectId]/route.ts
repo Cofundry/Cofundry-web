@@ -37,14 +37,25 @@ export async function GET(request: NextRequest) {
   try {
     const projectId = getProjectIdFromUrl(request);
 
-    if (!ObjectId.isValid(projectId)) {
-      return NextResponse.json({ error: 'Invalid project ID' }, { status: 400 });
+    const db = await getDB();
+    let project = null;
+
+    // If projectId looks like an ObjectId, query by _id. Otherwise try slug or id fields.
+    if (ObjectId.isValid(projectId)) {
+      project = await db
+        .collection('projects')
+        .findOne({ _id: new ObjectId(projectId) });
     }
 
-    const db = await getDB();
-    const project = await db
-      .collection('projects')
-      .findOne({ _id: new ObjectId(projectId) });
+    if (!project) {
+      // fallback: try slug or id fields (string matches)
+      project = await db.collection('projects').findOne({
+        $or: [
+          { slug: projectId },
+          { id: projectId },
+        ],
+      });
+    }
 
     if (!project) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
