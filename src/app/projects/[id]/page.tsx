@@ -67,13 +67,7 @@ async function getProject(id: string) {
     }
 }
 
-interface Props {
-    params: { id: string }
-}
-
-export default async function ProjectDetailsPage({
-    params,
-}: Props) {
+export default async function ProjectDetailsPage({ params }: any) {
     const { id } = params;
     
     if (!id) {
