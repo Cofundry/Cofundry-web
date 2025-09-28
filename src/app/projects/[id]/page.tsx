@@ -1,4 +1,4 @@
-// D:\Cofundry\Cofundry-web\src\app\projects\[id]\page.tsx
+use server
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
@@ -11,7 +11,10 @@ import {
     Briefcase, Clock, Globe, ShieldCheck, Sparkles
 } from "lucide-react"
 
-/* -------------------- utils: base url + formatting -------------------- */
+/* -------------------- utils: base url + for            <Footer7 />
+        </main>
+    );
+}g -------------------- */
 async function getBaseUrl() {
     if (process.env.NODE_ENV === 'production') {
         // In production, use relative URLs to avoid CORS and URL issues
