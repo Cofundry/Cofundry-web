@@ -119,19 +119,19 @@ export default async function ProjectDetailsPage(props: any) {
     }
 
     return (
-        <main className="min-h-screen bg-background text-gray-900">
+        <main className="min-h-screen bg-background">
             <Navbar1 />
 
-            <div className="flex items-center justify-center px-4 py-16 min-h-[calc(100vh-4rem)]">
-                <div className="w-full max-w-5xl mx-auto bg-white/5 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/10">
+            <div className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+                <div className="w-full bg-white/5 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-xl border border-white/10">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {/* Left: Main content */}
                         <div className="md:col-span-2 space-y-6">
-                            <h1 className="text-3xl md:text-4xl font-extrabold leading-tight">{displayData.title}</h1>
-                            <p className="text-lg text-muted-foreground">{displayData.description}</p>
+                            <h1 className="text-3xl md:text-4xl font-extrabold leading-tight text-foreground">{displayData.title}</h1>
+                            <p className="text-lg text-foreground/80">{displayData.description}</p>
 
                             <section className="mt-4">
-                                <h2 className="text-xl font-semibold mb-3">Project details</h2>
+                                <h2 className="text-xl font-semibold mb-3 text-foreground">Project details</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-3">
                                         <ProjectRow icon={<Tag className="h-4 w-4" />} label="Category" value={displayData.category} />
@@ -144,7 +144,7 @@ export default async function ProjectDetailsPage(props: any) {
                                         <div className="flex items-center gap-2 text-sm">
                                             <Globe className="h-4 w-4" />
                                             <span className="font-medium">Status:</span>
-                                            <Badge className="bg-[hsl(var(--primary))] hover:bg-[hsl(var(--primary))] hover:opacity-90 transition-opacity lowercase">
+                                            <Badge variant="secondary" className="bg-foreground/10 hover:bg-foreground/20 text-foreground transition-colors lowercase">
                                                 {displayData.status}
                                             </Badge>
                                         </div>
@@ -154,17 +154,17 @@ export default async function ProjectDetailsPage(props: any) {
 
                             {displayData.requirements && (
                                 <section>
-                                    <h3 className="text-lg font-medium mb-2">Requirements</h3>
-                                    <div className="prose max-w-none text-muted-foreground">{displayData.requirements}</div>
+                                    <h3 className="text-lg font-medium mb-2 text-foreground">Requirements</h3>
+                                    <div className="prose prose-invert max-w-none text-foreground/80">{displayData.requirements}</div>
                                 </section>
                             )}
 
                             {displayData.tech.length > 0 && (
                                 <section>
-                                    <h3 className="text-lg font-medium mb-2">Tech stack</h3>
+                                    <h3 className="text-lg font-medium mb-2 text-foreground">Tech stack</h3>
                                     <div className="flex flex-wrap gap-2">
                                         {displayData.tech.map((t: string) => (
-                                            <Badge key={t} className="bg-[hsl(var(--primary))] hover:bg-[hsl(var(--primary))] hover:opacity-90 transition-opacity">
+                                            <Badge key={t} variant="secondary" className="bg-foreground/10 hover:bg-foreground/20 text-foreground/90 transition-colors">
                                                 {t}
                                             </Badge>
                                         ))}
@@ -175,13 +175,13 @@ export default async function ProjectDetailsPage(props: any) {
 
                         {/* Right: Sidebar / CTAs */}
                         <aside className="md:col-span-1 space-y-6">
-                            <div className="rounded-xl border border-white/10 p-5 bg-white/3 backdrop-blur-sm">
+                            <div className="rounded-xl border border-white/10 p-5 backdrop-blur-sm bg-gradient-to-b from-white/5 to-white/[0.02]">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-sm text-muted-foreground">Posted by</p>
-                                        <p className="font-medium">{displayData.authorName}</p>
+                                        <p className="text-sm text-foreground/60">Posted by</p>
+                                        <p className="font-medium text-foreground">{displayData.authorName}</p>
                                     </div>
-                                    <div className="text-sm text-muted-foreground">{displayData.created}</div>
+                                    <div className="text-sm text-foreground/60">{displayData.created}</div>
                                 </div>
 
                                 <ProjectActionButtons 
