@@ -128,30 +128,160 @@ export default async function ProjectDetailsPage({
         notFound();
     }
 
-    let projectData;
-    try {
-        projectData = await getProject(params.id);
-        
-        if (!projectData || typeof projectData !== 'object') {
-            console.error('Project not found or invalid data');
-            notFound();
-        }
-    } catch (error) {
-        console.error('Error fetching project:', error);
+    const projectData = await getProject(params.id);
+    
+    if (!projectData || typeof projectData !== 'object') {
+        console.error('Project not found or invalid data');
         notFound();
     }
 
-    // Process the project data
-    const project = projectData;
-    const title = project?.title ?? project?.name ?? "Project";
-    const description = project?.description ?? project?.summary ?? "No description provided.";
-    if (!data) {
-        console.error('Project not found:', params.id);
-        notFound();
+    // Extract and process project data
+    const {
+        title = "Project",
+        name,
+        description,
+        summary,
+        category,
+        difficulty,
+        location,
+        budget,
+        deadline,
+        updatedAt,
+        createdAt,
+        status = "open",
+        logo,
+        tags = [],
+        techStack = [],
+        requirements = "",
+        teamSize,
+        teamComposition,
+        developerRequirements = "",
+        designerRequirements = "",
+        marketerRequirements = "",
+        commercialRequirements = "",
+        authorName = "Anonymous User",
+        authorEmail = "",
+        authorAvatar = "",
+        contactInfo = {},
+        attachments = []
+    } = projectData;
+
+    // Process the data with formatting
+    const displayTitle = title || name || "Project";
+    const displayDescription = description || summary || "No description provided.";
+    const displayBudget = formatBudget(budget) || "Not specified";
+    const displayDeadline = deadline ? formatDateUTC(deadline) : "Not specified";
+    const displayUpdated = formatDateUTC(updatedAt || createdAt);
+    const displayCreated = formatDateUTC(createdAt);
+    const displayTags = Array.isArray(tags) ? tags : [];
+    const displayTech = Array.isArray(techStack) ? techStack : [];
+
+    return (
+        <main className="min-h-screen bg-background">
+            <Navbar1 />
+            
+            <section className="relative overflow-hidden">
+                <div className="container px-4 md:px-6">
+                    <div className="flex flex-col gap-4 py-6">
+                        <h1 className="text-3xl font-bold">{displayTitle}</h1>
+                        <p className="text-lg opacity-90">{displayDescription}</p>
+
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-4">
+                                <ProjectRow 
+                                    icon={<Tag className="size-4 opacity-80" />} 
+                                    label="Category" 
+                                    value={category} 
+                                />
+                                <ProjectRow 
+                                    icon={<DollarSign className="size-4 opacity-80" />} 
+                                    label="Budget" 
+                                    value={displayBudget} 
+                                />
+                                <ProjectRow 
+                                    icon={<CalendarDays className="size-4 opacity-80" />} 
+                                    label="Deadline" 
+                                    value={displayDeadline} 
+                                />
+                                <ProjectRow 
+                                    icon={<MapPin className="size-4 opacity-80" />} 
+                                    label="Location" 
+                                    value={location} 
+                                />
+                            </div>
+
+                            <div className="space-y-4">
+                                <ProjectRow 
+                                    icon={<Gauge className="size-4 opacity-80" />} 
+                                    label="Difficulty" 
+                                    value={difficulty} 
+                                />
+                                <ProjectRow 
+                                    icon={<Users className="size-4 opacity-80" />} 
+                                    label="Team Size" 
+                                    value={teamSize?.toString()} 
+                                />
+                                <ProjectRow 
+                                    icon={<Clock className="size-4 opacity-80" />} 
+                                    label="Created" 
+                                    value={displayCreated} 
+                                />
+                                <ProjectRow 
+                                    icon={<Globe className="size-4 opacity-80" />} 
+                                    label="Status" 
+                                    value={status} 
+                                />
+                            </div>
+                        </div>
+
+                        {displayTags.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                                <span className="font-medium">Tags:</span>
+                                {displayTags.map((tag) => (
+                                    <Badge key={tag} variant="secondary">
+                                        {tag}
+                                    </Badge>
+                                ))}
+                            </div>
+                        )}
+
+                        {displayTech.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                                <span className="font-medium">Tech Stack:</span>
+                                {displayTech.map((tech) => (
+                                    <Badge key={tech} variant="outline">
+                                        {tech}
+                                    </Badge>
+                                ))}
+                            </div>
+                        )}
+
+                        {requirements && (
+                            <div className="space-y-2">
+                                <h2 className="text-xl font-semibold">Requirements</h2>
+                                <p className="opacity-90">{requirements}</p>
+                            </div>
+                        )}
+
+                        <div className="flex justify-end gap-4">
+                            <Button variant="outline">
+                                Contact Author
+                            </Button>
+                            <Button>
+                                Apply Now
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <Footer7 />
+        </main>
+    );
     }
 
     // API returns raw project doc
-    const project = data as any
+    // Process project data and display
 
     const title = project?.title ?? project?.name ?? "Project"
     const description = project?.description ?? project?.summary ?? "No description provided."
