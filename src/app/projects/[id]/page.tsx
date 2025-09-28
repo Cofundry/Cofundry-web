@@ -115,9 +115,17 @@ async function getProject(id: string) {
 }
 
 /* ------------------------------ page ------------------------------ */
-export default async function ProjectDetailsPage(
-    { params }: { params: { id: string } }
-) {
+interface PageProps {
+    params: {
+        id: string;
+    };
+    searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export default async function ProjectDetailsPage({
+    params,
+    searchParams,
+}: PageProps) {
     if (!params?.id) {
         console.error('No project ID provided');
         notFound();
