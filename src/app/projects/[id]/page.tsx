@@ -81,20 +81,25 @@ async function getProject(id: string) {
     }
 }
 
+type PageProps = {
+    params: Promise<{ id: string }>;
+    searchParams: { [key: string]: string | string[] | undefined };
+}
+
 export default async function ProjectDetailsPage({
     params,
-}: {
-    params: { id: string }
-}) {
-    if (!params?.id) {
+}: PageProps) {
+    const { id } = await params;
+    
+    if (!id) {
         console.error('No project ID provided')
         notFound()
     }
 
-    const data = await getProject(params.id)
+    const data = await getProject(id)
     
     if (!data) {
-        console.error('Project not found:', params.id)
+        console.error('Project not found:', id)
         notFound()
     }
 
