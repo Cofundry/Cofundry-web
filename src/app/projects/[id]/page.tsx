@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Navbar1 } from "@/components/ui/landingpage/navbar"
@@ -7,6 +8,8 @@ import {
     Tag, DollarSign, CalendarDays, MapPin, Users, Globe,
     Layers, Gauge, User, Code2, Briefcase, Clock, ShieldCheck, Sparkles
 } from "lucide-react"
+import ProjectClientFallback from '@/components/ui/ProjectClientFallback'
+import ProjectActionButtons from '@/components/ui/ProjectActionButtons'
 
 type ProjectRowProps = {
     icon: React.ReactNode;
@@ -47,7 +50,9 @@ function formatBudget(b: any): string {
 
 async function getProject(id: string) {
     try {
-        const res = await fetch(`/api/projects/${encodeURIComponent(id)}`, {
+        const base = process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+        const url = `${base}/api/projects/${encodeURIComponent(id)}`
+        const res = await fetch(url, {
             cache: "no-store",
             headers: {
                 'Content-Type': 'application/json'
@@ -67,8 +72,9 @@ async function getProject(id: string) {
     }
 }
 
-export default async function ProjectDetailsPage({ params }: any) {
-    const { id } = params;
+export default async function ProjectDetailsPage(props: any) {
+    const params = props.params
+    const { id } = await params
     
     if (!id) {
         console.error('No project ID provided')
@@ -76,10 +82,21 @@ export default async function ProjectDetailsPage({ params }: any) {
     }
 
     const data = await getProject(id)
-    
+
+    // If server-side fetch failed, render a client-side fallback to diagnose or display the project
     if (!data) {
-        console.error('Project not found:', id)
-        notFound()
+        console.warn('Server fetch failed; rendering client-side fallback for id:', id)
+        return (
+            <main className="min-h-screen bg-background flex items-center justify-center">
+                <Navbar1 />
+                <section className="w-full max-w-3xl px-4 py-8">
+                    {/* Client-side fallback will attempt to fetch and display the project */}
+                    {/* @ts-ignore */}
+                    <ProjectClientFallback id={id} />
+                </section>
+                <Footer7 />
+            </main>
+        )
     }
 
     // Extract project data with defaults
@@ -98,106 +115,93 @@ export default async function ProjectDetailsPage({ params }: any) {
         requirements: data.requirements || "",
         teamSize: data.teamSize?.toString() || "Not specified",
         authorName: data.authorName || "Anonymous User",
+        authorEmail: data.authorEmail || data.email || null,
     }
 
     return (
-        <main className="min-h-screen bg-background">
+        <main className="min-h-screen bg-background text-gray-900">
             <Navbar1 />
-            
-            <section className="relative overflow-hidden">
-                <div className="container px-4 md:px-6">
-                    <div className="flex flex-col gap-4 py-6">
-                        <h1 className="text-3xl font-bold">{displayData.title}</h1>
-                        <p className="text-lg opacity-90">{displayData.description}</p>
 
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div className="space-y-4">
-                                <ProjectRow 
-                                    icon={<Tag className="size-4 opacity-80" />} 
-                                    label="Category" 
-                                    value={displayData.category} 
-                                />
-                                <ProjectRow 
-                                    icon={<DollarSign className="size-4 opacity-80" />} 
-                                    label="Budget" 
-                                    value={displayData.budget} 
-                                />
-                                <ProjectRow 
-                                    icon={<CalendarDays className="size-4 opacity-80" />} 
-                                    label="Deadline" 
-                                    value={displayData.deadline} 
-                                />
-                                <ProjectRow 
-                                    icon={<MapPin className="size-4 opacity-80" />} 
-                                    label="Location" 
-                                    value={displayData.location} 
-                                />
-                            </div>
+            <div className="flex items-center justify-center px-4 py-16 min-h-[calc(100vh-4rem)]">
+                <div className="w-full max-w-5xl mx-auto bg-white/5 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/10">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {/* Left: Main content */}
+                        <div className="md:col-span-2 space-y-6">
+                            <h1 className="text-3xl md:text-4xl font-extrabold leading-tight">{displayData.title}</h1>
+                            <p className="text-lg text-muted-foreground">{displayData.description}</p>
 
-                            <div className="space-y-4">
-                                <ProjectRow 
-                                    icon={<Gauge className="size-4 opacity-80" />} 
-                                    label="Difficulty" 
-                                    value={displayData.difficulty} 
-                                />
-                                <ProjectRow 
-                                    icon={<Users className="size-4 opacity-80" />} 
-                                    label="Team Size" 
-                                    value={displayData.teamSize} 
-                                />
-                                <ProjectRow 
-                                    icon={<Clock className="size-4 opacity-80" />} 
-                                    label="Created" 
-                                    value={displayData.created} 
-                                />
-                                <ProjectRow 
-                                    icon={<Globe className="size-4 opacity-80" />} 
-                                    label="Status" 
-                                    value={displayData.status} 
-                                />
-                            </div>
+                            <section className="mt-4">
+                                <h2 className="text-xl font-semibold mb-3">Project details</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="space-y-3">
+                                        <ProjectRow icon={<Tag className="h-4 w-4" />} label="Category" value={displayData.category} />
+                                        <ProjectRow icon={<DollarSign className="h-4 w-4" />} label="Budget" value={displayData.budget} />
+                                        <ProjectRow icon={<CalendarDays className="h-4 w-4" />} label="Deadline" value={displayData.deadline} />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <ProjectRow icon={<MapPin className="h-4 w-4" />} label="Location" value={displayData.location} />
+                                        <ProjectRow icon={<Users className="h-4 w-4" />} label="Team size" value={displayData.teamSize} />
+                                        <div className="flex items-center gap-2 text-sm">
+                                            <Globe className="h-4 w-4" />
+                                            <span className="font-medium">Status:</span>
+                                            <Badge className="bg-[hsl(var(--primary))] hover:bg-[hsl(var(--primary))] hover:opacity-90 transition-opacity lowercase">
+                                                {displayData.status}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {displayData.requirements && (
+                                <section>
+                                    <h3 className="text-lg font-medium mb-2">Requirements</h3>
+                                    <div className="prose max-w-none text-muted-foreground">{displayData.requirements}</div>
+                                </section>
+                            )}
+
+                            {displayData.tech.length > 0 && (
+                                <section>
+                                    <h3 className="text-lg font-medium mb-2">Tech stack</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {displayData.tech.map((t: string) => (
+                                            <Badge key={t} className="bg-[hsl(var(--primary))] hover:bg-[hsl(var(--primary))] hover:opacity-90 transition-opacity">
+                                                {t}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
                         </div>
 
-                        {displayData.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-2">
-                                <span className="font-medium">Tags:</span>
-                                {displayData.tags.map((tag: string) => (
-                                    <Badge key={tag} variant="secondary">
-                                        {tag}
-                                    </Badge>
-                                ))}
-                            </div>
-                        )}
+                        {/* Right: Sidebar / CTAs */}
+                        <aside className="md:col-span-1 space-y-6">
+                            <div className="rounded-xl border border-white/10 p-5 bg-white/3 backdrop-blur-sm">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Posted by</p>
+                                        <p className="font-medium">{displayData.authorName}</p>
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">{displayData.created}</div>
+                                </div>
 
-                        {displayData.tech.length > 0 && (
-                            <div className="flex flex-wrap gap-2">
-                                <span className="font-medium">Tech Stack:</span>
-                                {displayData.tech.map((tech: string) => (
-                                    <Badge key={tech} variant="outline">
-                                        {tech}
-                                    </Badge>
-                                ))}
+                                <ProjectActionButtons 
+                                    title={displayData.title}
+                                    authorEmail={displayData.authorEmail}
+                                />
                             </div>
-                        )}
 
-                        {displayData.requirements && (
-                            <div className="space-y-2">
-                                <h2 className="text-xl font-semibold">Requirements</h2>
-                                <p className="opacity-90">{displayData.requirements}</p>
+                            <div className="rounded-xl border border-white/10 p-5 bg-white/3 backdrop-blur-sm">
+                                <h4 className="text-base font-medium">Quick info</h4>
+                                <div className="mt-4 space-y-3 text-sm text-muted-foreground/90">
+                                    <div>Category: {displayData.category}</div>
+                                    <div>Budget: {displayData.budget}</div>
+                                    <div>Deadline: {displayData.deadline}</div>
+                                </div>
                             </div>
-                        )}
-
-                        <div className="flex justify-end gap-4">
-                            <Button variant="outline">
-                                Contact Author
-                            </Button>
-                            <Button>
-                                Apply Now
-                            </Button>
-                        </div>
+                        </aside>
                     </div>
                 </div>
-            </section>
+            </div>
 
             <Footer7 />
         </main>
