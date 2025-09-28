@@ -19,10 +19,10 @@ type ProjectRowProps = {
 
 function ProjectRow({ icon, label, value }: ProjectRowProps) {
     return (
-        <div className="flex items-center gap-2 text-sm">
-            {icon}
-            <span className="font-medium">{label}:</span>
-            <span className="opacity-80">{value || 'Not specified'}</span>
+        <div className="flex items-center gap-2 text-sm py-1">
+            <span className="text-muted-foreground">{icon}</span>
+            <span className="font-medium text-foreground">{label}:</span>
+            <span className="text-muted-foreground">{value || 'Not specified'}</span>
         </div>
     );
 }
@@ -119,16 +119,16 @@ export default async function ProjectDetailsPage(props: any) {
     }
 
     return (
-        <main className="min-h-screen bg-background">
+        <main className="relative min-h-screen bg-background flex flex-col">
             <Navbar1 />
 
-            <div className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-                <div className="w-full bg-white/5 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-xl border border-white/10">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="flex-grow flex items-start justify-center w-full py-12 px-4 sm:px-6 lg:px-8">
+                <div className="w-full max-w-6xl bg-background border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 p-6 md:p-8">
                         {/* Left: Main content */}
                         <div className="md:col-span-2 space-y-6">
-                            <h1 className="text-3xl md:text-4xl font-extrabold leading-tight text-foreground">{displayData.title}</h1>
-                            <p className="text-lg text-foreground/80">{displayData.description}</p>
+                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">{displayData.title}</h1>
+                            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">{displayData.description}</p>
 
                             <section className="mt-4">
                                 <h2 className="text-xl font-semibold mb-3 text-foreground">Project details</h2>
@@ -144,7 +144,7 @@ export default async function ProjectDetailsPage(props: any) {
                                         <div className="flex items-center gap-2 text-sm">
                                             <Globe className="h-4 w-4" />
                                             <span className="font-medium">Status:</span>
-                                            <Badge variant="secondary" className="bg-foreground/10 hover:bg-foreground/20 text-foreground transition-colors lowercase">
+                                            <Badge variant="outline" className="capitalize bg-primary/10 hover:bg-primary/20 text-primary border-primary/20">
                                                 {displayData.status}
                                             </Badge>
                                         </div>
@@ -160,11 +160,11 @@ export default async function ProjectDetailsPage(props: any) {
                             )}
 
                             {displayData.tech.length > 0 && (
-                                <section>
-                                    <h3 className="text-lg font-medium mb-2 text-foreground">Tech stack</h3>
+                                <section className="border-t border-white/10 pt-6">
+                                    <h3 className="text-lg font-semibold mb-3 text-foreground">Tech stack</h3>
                                     <div className="flex flex-wrap gap-2">
                                         {displayData.tech.map((t: string) => (
-                                            <Badge key={t} variant="secondary" className="bg-foreground/10 hover:bg-foreground/20 text-foreground/90 transition-colors">
+                                            <Badge key={t} variant="outline" className="bg-primary/10 hover:bg-primary/20 text-primary border-primary/20">
                                                 {t}
                                             </Badge>
                                         ))}
@@ -175,13 +175,15 @@ export default async function ProjectDetailsPage(props: any) {
 
                         {/* Right: Sidebar / CTAs */}
                         <aside className="md:col-span-1 space-y-6">
-                            <div className="rounded-xl border border-white/10 p-5 backdrop-blur-sm bg-gradient-to-b from-white/5 to-white/[0.02]">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm text-foreground/60">Posted by</p>
-                                        <p className="font-medium text-foreground">{displayData.authorName}</p>
+                            <div className="rounded-lg overflow-hidden border border-white/10 bg-white/5">
+                                <div className="p-4 border-b border-white/10">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm text-muted-foreground">Posted by</p>
+                                            <p className="font-medium text-foreground">{displayData.authorName}</p>
+                                        </div>
+                                        <div className="text-sm text-muted-foreground">{displayData.created}</div>
                                     </div>
-                                    <div className="text-sm text-foreground/60">{displayData.created}</div>
                                 </div>
 
                                 <ProjectActionButtons 
@@ -190,12 +192,23 @@ export default async function ProjectDetailsPage(props: any) {
                                 />
                             </div>
 
-                            <div className="rounded-xl border border-white/10 p-5 bg-white/3 backdrop-blur-sm">
-                                <h4 className="text-base font-medium">Quick info</h4>
-                                <div className="mt-4 space-y-3 text-sm text-muted-foreground/90">
-                                    <div>Category: {displayData.category}</div>
-                                    <div>Budget: {displayData.budget}</div>
-                                    <div>Deadline: {displayData.deadline}</div>
+                            <div className="rounded-lg overflow-hidden border border-white/10 bg-white/5">
+                                <div className="p-4 border-b border-white/10">
+                                    <h4 className="font-medium text-foreground">Quick info</h4>
+                                </div>
+                                <div className="p-4 space-y-3 text-sm">
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Category</span>
+                                        <span className="text-foreground">{displayData.category}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Budget</span>
+                                        <span className="text-foreground">{displayData.budget}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Deadline</span>
+                                        <span className="text-foreground">{displayData.deadline}</span>
+                                    </div>
                                 </div>
                             </div>
                         </aside>
