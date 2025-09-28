@@ -13,13 +13,26 @@ import {
 
 /* -------------------- utils: base url + formatting -------------------- */
 async function getBaseUrl() {
-    const env = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL
-    if (env) return env.startsWith("http") ? env : `https://${env}`
+    // First priority: explicit APP_URL
+    if (process.env.NEXT_PUBLIC_APP_URL) {
+        return process.env.NEXT_PUBLIC_APP_URL;
+    }
 
-    const h = await headers()
-    const host = h.get("x-forwarded-host") ?? h.get("host")
-    const proto = h.get("x-forwarded-proto") ?? "http"
-    return host ? `${proto}://${host}` : "http://localhost:3000"
+    // Second priority: Vercel deployment URL
+    if (process.env.VERCEL_URL) {
+        return `https://${process.env.VERCEL_URL}`;
+    }
+
+    // Third priority: Request headers for local dev
+    const h = await headers();
+    const host = h.get("x-forwarded-host") ?? h.get("host");
+    if (host) {
+        const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+        return `${protocol}://${host}`;
+    }
+
+    // Fallback for local development
+    return "http://localhost:3000";
 }
 
 
@@ -61,35 +74,60 @@ function safeText(v: any, fallback = "—") {
 /* ----------------------------- data fetch ----------------------------- */
 /* ----------------------------- data fetch ----------------------------- */
 async function getProject(id: string) {
-    const base = await getBaseUrl()
-
-    const h = await headers()
-    const cookie = h.get("cookie") ?? undefined
-    const authorization = h.get("authorization") ?? undefined
-
-    const res = await fetch(`${base}/api/projects/${encodeURIComponent(id)}`, {
-        cache: "no-store",
-        headers: {
-            ...(cookie ? { cookie } : {}),
-            ...(authorization ? { authorization } : {}),
-        },
-    })
-
-    if (!res.ok) return null
     try {
-        return await res.json()
-    } catch {
-        return null
+        const base = await getBaseUrl();
+        console.log('Base URL:', base); // Debug URL construction
+
+        const h = await headers();
+        const cookie = h.get("cookie");
+        const authorization = h.get("authorization");
+
+        const url = `${base}/api/projects/${encodeURIComponent(id)}`;
+        console.log('Fetching from:', url); // Debug final URL
+
+        const res = await fetch(url, {
+            cache: "no-store",
+            headers: {
+                'Content-Type': 'application/json',
+                ...(cookie ? { cookie } : {}),
+                ...(authorization ? { authorization } : {}),
+            },
+            next: { revalidate: 0 }
+        });
+
+        if (!res.ok) {
+            console.error('Project fetch failed:', res.status, res.statusText);
+            if (res.status === 404) return null;
+            throw new Error(`Failed to fetch project: ${res.statusText}`);
+        }
+
+        const data = await res.json();
+        if (!data) {
+            console.error('No data returned from API');
+            return null;
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error fetching project:', error);
+        return null;
     }
 }
 
 /* ------------------------------ page ------------------------------ */
 export default async function ProjectDetailsPage(
-    { params }: { params: Promise<{ id: string }> }
+    { params }: { params: { id: string } }
 ) {
-    const { id } = await params;
-    const data = await getProject(id);
-    if (!data) notFound();
+    if (!params?.id) {
+        console.error('No project ID provided');
+        notFound();
+    }
+
+    const data = await getProject(params.id);
+    if (!data) {
+        console.error('Project not found:', params.id);
+        notFound();
+    }
 
     // API returns raw project doc
     const project = data as any
