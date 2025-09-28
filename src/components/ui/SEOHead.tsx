@@ -34,7 +34,7 @@ export default function SEOHead({
     "team formation",
     "innovation platform"
   ],
-  image = "/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png",
+  image = "/og-image.svg",
   url = "https://cofundry.com",
   type = "website",
   publishedTime,
@@ -104,9 +104,9 @@ export default function SEOHead({
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       
       {/* Favicon and app icons */}
-      <link rel="icon" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" type="image/png" />
-      <link rel="icon" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" />
-      <link rel="apple-touch-icon" href="/ChatGPT Image Aug 22, 2025, 05_05_35 PM.png" />
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  <link rel="icon" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.png" />
       <link rel="manifest" href="/site.webmanifest" />
     </Head>
   )
